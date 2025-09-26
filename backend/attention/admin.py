@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Attention
 
-from import_export.admin import ImportExportModelAdmin # 1. Importar
+from import_export.admin import ImportExportModelAdmin
 from attention.resources import AttentionResource
 
 from django.http import HttpResponse
@@ -9,6 +9,10 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.styles import ParagraphStyle
 
 @admin.register(Attention)
 class AttentionAdmin(ImportExportModelAdmin):
@@ -66,12 +70,19 @@ class AttentionAdmin(ImportExportModelAdmin):
         response['Content-Disposition'] = 'attachment; filename="atenciones.pdf"'
 
         # Configuración del documento PDF
-        doc = SimpleDocTemplate(response, rightMargin=inch/4, leftMargin=inch/4, topMargin=inch/2, bottomMargin=inch/4)
+        doc = SimpleDocTemplate(response, pagesize=landscape(letter), rightMargin=inch/4, leftMargin=inch/4, topMargin=inch/2, bottomMargin=inch/4)
         elements = []
         styles = getSampleStyleSheet()
 
+        # Estilos del Titulo
+        title_style = ParagraphStyle(
+            name="TitleCenter",
+            parent=styles['h1'],
+            alignment=TA_CENTER
+        )
+
         # Título
-        elements.append(Paragraph("Reporte de Atenciones", styles['h1']))
+        elements.append(Paragraph("Reporte de Atenciones", title_style))
 
         # Preparar los datos para la tabla
         data = [
@@ -89,7 +100,7 @@ class AttentionAdmin(ImportExportModelAdmin):
             ])
 
         # Crear y estilizar la tabla
-        table = Table(data)
+        table = Table(data, hAlign='CENTER')
         style = TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
