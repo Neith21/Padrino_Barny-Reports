@@ -30,8 +30,4 @@ class AttentionResource(resources.ModelResource):
 
     class Meta:
         model = Attention
-        # Define los campos que quieres incluir en la importación/exportación y su orden.
         fields = ('id', 'teacher', 'student', 'subject', 'attention_date', 'channel', 'description')
-        # Si no quieres que se importen registros nuevos, solo actualizar, usa:
-        # skip_unchanged = True
-        # report_skipped = True

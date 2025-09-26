@@ -85,7 +85,7 @@ class AttentionAdmin(ImportExportModelAdmin):
                 attention.student.carnet if attention.student else "N/A",
                 student_name,
                 attention.subject.name if attention.subject else "N/A",
-                attention.get_channel_display() # Usa el valor legible
+                attention.get_channel_display()
             ])
 
         # Crear y estilizar la tabla
