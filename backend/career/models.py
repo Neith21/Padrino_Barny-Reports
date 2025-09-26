@@ -21,6 +21,6 @@ class Career(models.Model):
 
     class Meta:
         db_table = 'career'
-        verbose_name = 'Career'
-        verbose_name_plural = 'Careers'
+        verbose_name = 'Carrera'
+        verbose_name_plural = 'Carreras'
         ordering = ['name']

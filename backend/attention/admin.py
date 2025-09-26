@@ -1,9 +1,19 @@
 from django.contrib import admin
 from .models import Attention
 
+from import_export.admin import ImportExportModelAdmin # 1. Importar
+from attention.resources import AttentionResource
+
+from django.http import HttpResponse
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+
 @admin.register(Attention)
-class AttentionAdmin(admin.ModelAdmin):
-    # --- Vista de Lista ---
+class AttentionAdmin(ImportExportModelAdmin):
+    resource_class = AttentionResource
+
     list_display = (
         'attention_date',
         'teacher',
@@ -47,6 +57,62 @@ class AttentionAdmin(admin.ModelAdmin):
             'fields': ('created_by', 'created_at', 'modified_by', 'updated_at'),
         }),
     )
+
+    actions = ['export_as_pdf']
+
+    @admin.action(description='Exportar seleccionados a PDF')
+    def export_as_pdf(self, request, queryset):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="atenciones.pdf"'
+
+        # Configuración del documento PDF
+        doc = SimpleDocTemplate(response, rightMargin=inch/4, leftMargin=inch/4, topMargin=inch/2, bottomMargin=inch/4)
+        elements = []
+        styles = getSampleStyleSheet()
+
+        # Título
+        elements.append(Paragraph("Reporte de Atenciones", styles['h1']))
+
+        # Preparar los datos para la tabla
+        data = [
+            ['Fecha', 'Docente', 'Carnet', 'Estudiante', 'Asignatura', 'Canal']
+        ]
+        for attention in queryset.order_by('attention_date'):
+            student_name = f"{attention.student.first_name} {attention.student.last_name}" if attention.student else "N/A"
+            data.append([
+                attention.attention_date.strftime('%Y-%m-%d %H:%M'),
+                attention.teacher.username if attention.teacher else "N/A",
+                attention.student.carnet if attention.student else "N/A",
+                student_name,
+                attention.subject.name if attention.subject else "N/A",
+                attention.get_channel_display() # Usa el valor legible
+            ])
+
+        # Crear y estilizar la tabla
+        table = Table(data)
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ])
+        table.setStyle(style)
+
+        elements.append(table)
+        doc.build(elements)
+
+        return response
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return qs
+
+        return qs.filter(teacher=request.user)
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:

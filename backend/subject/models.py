@@ -24,8 +24,8 @@ class Subject(models.Model):
 
     class Meta:
         db_table = 'subject'
-        verbose_name = 'Subject'
-        verbose_name_plural = 'Subjects'
+        verbose_name = 'Asignatura'
+        verbose_name_plural = 'Asignaturas'
         # Esta es la restricción clave para evitar que se repita un tema con la misma sección.
         constraints = [
             models.UniqueConstraint(fields=['name', 'section'], name='unique_subject_section')

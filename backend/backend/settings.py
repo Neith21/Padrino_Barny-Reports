@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'subject',
     'student_subject',
     'attention',
+    'import_export',
 ]
 
 MIDDLEWARE = [

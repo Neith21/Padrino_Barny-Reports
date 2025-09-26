@@ -46,6 +46,6 @@ class Student(models.Model):
 
     class Meta:
         db_table = 'student'
-        verbose_name = 'Student'
-        verbose_name_plural = 'Students'
+        verbose_name = 'Estudiante'
+        verbose_name_plural = 'Estudiantes'
         ordering = ['last_name', 'first_name'] # Ordena por apellido y luego por nombre
