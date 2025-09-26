@@ -81,3 +81,6 @@ A partir de aquí tenemos la libertad de hacer lo que sea.
 Para volver a usar el backend es necesario activar el entorno virtual y correr el servidor.
 
 ---
+
+# NOTA PARA IMPORTACIÓN
+Se puede exportar los datos que ya existen y luego intentar importarlos para hacer una prueba, se podrá siempre y cuando se deje la parte de los `id` de las atenciones vacíos, o sea, no eliminar el campo o columna. De esta manera se intuye el formato a seguir para cuando se necesite importar.
